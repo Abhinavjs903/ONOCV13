@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EKATRIT BHARAT - Apni Rai Dein | अपनी राय दें</title>
+    <style>
+        :root {
+            --color-saffron: #ff9933;
+            --color-saffron-dark: #ff8800;
+            --color-green: #1b7d4a;
+            --color-dark: #1a1a1a;
+            --color-dark-2: #2a2a2a;
+            --color-light: #6b6b6b;
+            --color-light-2: #aaa;
+            --color-white: #ffffff;
+            --color-cream: #faf8f3;
+            --color-border: #ddd;
+            --color-border-dark: #333;
+            --color-error: #c0142f;
+            --color-success: #27ae60;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-cream);
+            color: var(--color-dark);
+            line-height: 1.6;
+        }
+
+        body.admin-mode {
+            background-color: var(--color-dark);
+            color: var(--color-light-2);
+        }
+
+        /* ADMIN PIN LOCK */
+        .admin-pin-lock {
+            display: flex;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-2) 100%);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .admin-pin-lock.hidden {
+            display: none;
+        }
+
+        .admin-pin-container {
+            background: var(--color-dark-2);
+            border: 2px solid var(--color-saffron);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(255, 153, 51, 0.2);
+        }
+
+        .admin-pin-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .admin-pin-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-size: 18px;
+            letter-spacing: 4px;
+            border: 2px solid var(--color-border-dark);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-saffron);
+            text-align: center;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .admin-pin-input:focus {
+            outline: none;
+            border-color: var(--color-saffron);
+            box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.2);
+        }
+
+        .admin-pin-btn {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: linear-gradient(135deg, var(--color-saffron) 0%, var(--color-saffron-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-pin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 153, 51, 0.4);
+        }
+
+        .admin-pin-error {
+            color: var(--color-error);
+            font-size: 12px;
+            margin-top: var(--spacing-sm);
+            display: none;
+        }
+
+        .admin-pin-error.show {
+            display: block;
+        }
+
+        /* VOTING PAGE STYLES */
+        .voting-page {
+            display: none;
+        }
+
+        .voting-page.active {
+            display: block;
+        }
+
+        /* ADMIN PAGE STYLES */
+        .admin-page {
+            display: none;
+        }
+
+        .admin-page.active {
+            display: block;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            border-bottom: 3px solid var(--color-saffron);
+        }
+
+        body.admin-mode .navbar {
+            background: linear-gradient(135deg, var(--color-saffron) 0%, var(--color-saffron-dark) 100%);
+            border-bottom: none;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-lg) var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-xl);
+        }
+
+        .navbar-logo {
+            font-size: 24px;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: 2px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        body.admin-mode .navbar-logo span {
+            color: white;
+        }
+
+        .navbar-logo span:first-child {
+            color: var(--color-saffron);
+        }
+
+        .navbar-logo span:last-child {
+            color: var(--color-green);
+        }
+
+        body.admin-mode .navbar-logo span:first-child {
+            color: white;
+        }
+
+        body.admin-mode .navbar-logo span:last-child {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-link {
+            text-decoration: none;
+            color: var(--color-dark);
+            font-weight: 600;
+            font-size: 15px;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        body.admin-mode .navbar-link {
+            color: white;
+        }
+
+        .navbar-link:hover {
+            color: var(--color-saffron);
+        }
+
+        .navbar-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: var(--color-saffron);
+            transition: width 0.3s ease;
+        }
+
+        .navbar-link:hover::after {
+            width: 100%;
+        }
+
+        .navbar-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .btn-primary-nav {
+            background: var(--color-saffron);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-nav:hover {
+            background: #ff8800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);
+        }
+
+        .btn-secondary-nav {
+            background: var(--color-green);
+            color: white;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-nav:hover {
+            background: #146938;
+            transform: translateY(-2px);
+        }
+
+        body.admin-mode .btn-primary-nav,
+        body.admin-mode .btn-secondary-nav {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        body.admin-mode .btn-primary-nav:hover,
+        body.admin-mode .btn-secondary-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(45deg, #ff9933 0%, #ffaa44 25%, #ff6b35 50%, #ffaa44 75%, #ff9933 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            color: white;
+            padding: 80px var(--spacing-lg);
+            text-align: center;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 8vw, 56px);
+            margin-bottom: var(--spacing-md);
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .hero-hindi {
+            font-size: clamp(28px, 6vw, 42px);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 700;
+            opacity: 0.95;
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.95;
+            max-width: 700px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: var(--spacing-lg);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--color-saffron);
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border: 2px solid white;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--color-saffron);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        /* SECTION */
+        section {
+            padding: var(--spacing-xl) var(--spacing-md);
+        }
+
+        section h2 {
+            font-size: clamp(28px, 5vw, 42px);
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-saffron);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .admin-page section h2 {
+            color: var(--color-saffron);
+            border-bottom: 2px solid var(--color-border-dark);
+            padding-bottom: var(--spacing-md);
+        }
+
+        /* CARDS */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--color-saffron);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--color-saffron-dark);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+            display: inline-block;
+        }
+
+        .card h3 {
+            font-size: 18px;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-saffron);
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--color-light);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* STATS GRID ADMIN */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .stat-card {
+            background: var(--color-dark-2);
+            border: 1px solid var(--color-border-dark);
+            border-left: 4px solid var(--color-saffron);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border-left: 4px solid var(--color-saffron-dark);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--color-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 700;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: var(--color-success);
+        }
+
+        /* CHART SECTION */
+        .chart-section {
+            background: var(--color-dark-2);
+            border: 1px solid var(--color-border-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--color-border-dark);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-xl);
+        }
+
+        .chart-wrapper {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border-dark);
+        }
+
+        #voteChart {
+            max-width: 100%;
+            height: 300px;
+        }
+
+        /* CANDIDATES TABLE */
+        .candidates-section {
+            background: var(--color-dark-2);
+            border: 1px solid var(--color-border-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .candidates-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--color-border-dark);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .candidates-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .candidates-table thead {
+            background: rgba(255, 153, 51, 0.1);
+        }
+
+        .candidates-table th {
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: 800;
+            color: var(--color-saffron);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--color-border-dark);
+        }
+
+        .candidates-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border-dark);
+            font-size: 14px;
+            color: var(--color-light-2);
+        }
+
+        .candidates-table tbody tr:hover {
+            background: rgba(255, 153, 51, 0.05);
+        }
+
+        .candidate-name {
+            font-weight: 700;
+            color: var(--color-white);
+        }
+
+        .candidate-party {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .vote-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex: 1;
+        }
+
+        .vote-bar-fill {
+            background: linear-gradient(90deg, var(--color-saffron) 0%, var(--color-saffron-dark) 100%);
+            height: 24px;
+            border-radius: var(--radius);
+            min-width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: var(--spacing-sm);
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* LOGS */
+        .logs-section {
+            background: var(--color-dark-2);
+            border: 1px solid var(--color-border-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .logs-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 2px solid var(--color-border-dark);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .logs-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: var(--spacing-md);
+            border-left: 3px solid var(--color-saffron);
+            background: rgba(255, 153, 51, 0.03);
+            margin-bottom: var(--spacing-sm);
+            border-radius: var(--radius);
+            font-size: 13px;
+            color: var(--color-light-2);
+        }
+
+        .log-time {
+            color: var(--color-saffron);
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .log-action {
+            color: var(--color-white);
+            margin: var(--spacing-xs) 0;
+        }
+
+        .log-details {
+            color: var(--color-light);
+            font-size: 12px;
+            margin-top: var(--spacing-xs);
+        }
+
+        /* CONTROLS */
+        .controls-section {
+            background: var(--color-dark-2);
+            border: 1px solid var(--color-border-dark);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .controls-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .control-btn {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 2px solid var(--color-border-dark);
+            background: transparent;
+            color: var(--color-light-2);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            border-color: var(--color-saffron);
+            color: var(--color-saffron);
+        }
+
+        .control-btn.danger {
+            border-color: var(--color-error);
+            color: var(--color-error);
+        }
+
+        .control-btn.danger:hover {
+            background: rgba(192, 20, 47, 0.1);
+        }
+
+        /* TRANSPARENCY GRID */
+        .transparency-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .transparency-item {
+            background: linear-gradient(135deg, rgba(255, 153, 51, 0.05) 0%, rgba(255, 153, 51, 0.02) 100%);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            border: 2px solid var(--color-border);
+        }
+
+        .transparency-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--color-saffron);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .transparency-label {
+            color: var(--color-light);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* PROFILE PAGE */
+        .profile-page {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-cream);
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .profile-page.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, var(--color-saffron) 0%, var(--color-saffron-dark) 100%);
+            color: white;
+            padding: var(--spacing-lg) var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .profile-header h2 {
+            font-size: 28px;
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .profile-header p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: var(--spacing-xl) var(--spacing-md);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            flex-grow: 1;
+        }
+
+        .profile-sidebar {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-saffron);
+            height: fit-content;
+            position: sticky;
+            top: 140px;
+        }
+
+        .profile-sidebar h3 {
+            color: var(--color-saffron);
+            font-size: 18px;
+            margin-bottom: var(--spacing-lg);
+            font-weight: 800;
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .profile-info-item {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .profile-info-label {
+            font-size: 12px;
+            color: var(--color-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .profile-info-value {
+            font-size: 15px;
+            color: var(--color-dark);
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .profile-voting-section {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-green);
+        }
+
+        .profile-voting-section h3 {
+            color: var(--color-green);
+            font-size: 18px;
+            margin-bottom: var(--spacing-lg);
+            font-weight: 800;
+        }
+
+        .vote-option {
+            display: block;
+            padding: var(--spacing-lg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            position: relative;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .vote-option:hover {
+            border-color: var(--color-saffron);
+            background: rgba(255, 153, 51, 0.02);
+        }
+
+        .vote-option input[type="radio"] {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .vote-option-content {
+            padding-right: 30px;
+        }
+
+        .vote-option-name {
+            font-weight: 800;
+            color: var(--color-dark);
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .vote-option-party {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .vote-option-agenda {
+            font-size: 12px;
+            color: var(--color-light);
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+
+        .profile-action-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .btn-submit-vote {
+            flex: 1;
+            background: var(--color-green);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit-vote:hover {
+            background: #146938;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 125, 74, 0.3);
+        }
+
+        .btn-exit-profile {
+            flex: 1;
+            background: transparent;
+            color: var(--color-dark);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-exit-profile:hover {
+            border-color: var(--color-saffron);
+            color: var(--color-saffron);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--color-dark);
+            color: white;
+            padding: var(--spacing-xl) var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        body.admin-mode footer {
+            background: var(--color-dark);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .footer-section h4 {
+            margin-bottom: var(--spacing-md);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .footer-section a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--color-saffron);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #444;
+            padding-top: var(--spacing-lg);
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: var(--color-white);
+            margin: 5% auto;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            width: 90%;
+            max-width: 550px;
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 3px solid var(--color-saffron);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .modal-header h3 {
+            color: var(--color-saffron);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: var(--color-light);
+            transition: color 0.3s;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--color-saffron);
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            background: var(--color-success);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            animation: slideInUp 0.3s ease;
+            z-index: 1002;
+            font-size: 14px;
+            max-width: 400px;
+        }
+
+        .toast.error {
+            background: var(--color-error);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* UTILITIES */
+        .text-center {
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .disclaimer-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--color-saffron);
+            padding: var(--spacing-md);
+            border-radius: var(--radius);
+            margin-bottom: var(--spacing-lg);
+            font-size: 13px;
+            color: var(--color-dark);
+        }
+
+        /* FORM GROUP */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 700;
+            color: var(--color-dark);
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius);
+            font-family: var(--font-family);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-saffron);
+            box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-dark-2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-saffron);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-saffron-dark);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+
+            .navbar-buttons {
+                gap: var(--spacing-sm);
+            }
+
+            .btn-primary-nav, .btn-secondary-nav {
+                padding: var(--spacing-sm) var(--spacing-md);
+                font-size: 13px;
+            }
+
+            .hero {
+                padding: 60px var(--spacing-md);
+                min-height: 400px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero-cta {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary, .btn-primary-nav, .btn-secondary-nav {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+
+            section {
+                padding: var(--spacing-lg) var(--spacing-md);
+            }
+
+            .card {
+                padding: var(--spacing-md);
+            }
+
+            .profile-container {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-lg);
+            }
+
+            .profile-sidebar {
+                position: static;
+                top: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ADMIN PIN LOCK -->
+    <div id="adminPinLock" class="admin-pin-lock hidden">
+        <div class="admin-pin-container">
+            <div class="admin-pin-title">🔐 ADMIN ACCESS</div>
+            <input type="password" id="adminPinInput" class="admin-pin-input" placeholder="Enter PIN" maxlength="6">
+            <div class="admin-pin-error" id="adminPinError">Invalid PIN. Try again.</div>
+            <button class="admin-pin-btn" onclick="verifyAdminPin()">UNLOCK PANEL</button>
+        </div>
+    </div>
+
+    <!-- VOTING PAGE -->
+    <div id="votingPage" class="voting-page active">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="#" class="navbar-logo" onclick="location.reload()">
+                    <span style="color: var(--color-saffron); font-weight: 800;">EKATRIT</span>
+                    <span style="color: var(--color-green); font-weight: 800;">BHARAT</span>
+                </a>
+                <ul class="navbar-menu">
+                    <li><a href="#about" class="navbar-link">About</a></li>
+                    <li><a href="#transparency" class="navbar-link">Results</a></li>
+                    <li><a href="#contact" class="navbar-link">Contact</a></li>
+                </ul>
+                <div class="navbar-buttons">
+                    <button class="btn-primary-nav" onclick="startVotingFlow()">🗳️ Vote</button>
+                    <button class="btn-secondary-nav" onclick="openAdminAccess()">🔐 Admin</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>One Nation One Election</h1>
+            <div class="hero-hindi">एक राष्ट्र एक चुनाव</div>
+            <p class="hero-sub">United Democracy. Synchronized Elections. Democratic Participation.</p>
+            <div class="hero-cta">
+                <button class="btn-primary" onclick="startVotingFlow()">🗳️ Start Voting</button>
+                <button class="btn-secondary" onclick="openAdminAccess()">🔐 Admin Panel</button>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="about" class="container">
+            <h2>About EKATRIT BHARAT</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">🗳️</div>
+                    <h3>Opinion Voting</h3>
+                    <p>Share your grassroots sentiment. Mock voting system for understanding community preferences.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Data-Driven</h3>
+                    <p>Real-time sentiment analysis. Understand what matters most to communities.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted. DOB verified voting. Demo platform for civic engagement.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📱</div>
+                    <h3>Mobile First</h3>
+                    <p>Works on all devices. Built for rural India. Accessible to all.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transparency -->
+        <section id="transparency" class="container">
+            <h2>Transparency Dashboard</h2>
+            <p class="text-center" style="color: var(--color-light); margin-bottom: var(--spacing-lg); font-size: 15px;">
+                Aggregate, anonymized voting data. No personal information revealed.
+            </p>
+            <div class="transparency-grid">
+                <div class="transparency-item">
+                    <div class="transparency-number" id="totalVotes">0</div>
+                    <div class="transparency-label">Votes Cast</div>
+                </div>
+                <div class="transparency-item">
+                    <div class="transparency-number" id="totalVoters">0</div>
+                    <div class="transparency-label">Verified Voters</div>
+                </div>
+                <div class="transparency-item">
+                    <div class="transparency-number" id="participationRate">0%</div>
+                    <div class="transparency-label">Participation Rate</div>
+                </div>
+                <div class="transparency-item">
+                    <div class="transparency-number">18+</div>
+                    <div class="transparency-label">Age Requirement</div>
+                </div>
+            </div>
+            <div style="margin-top: var(--spacing-xl); background: var(--color-white); padding: var(--spacing-lg); border-radius: var(--radius-lg); border-left: 4px solid var(--color-saffron);">
+                <h3 style="color: var(--color-saffron); margin-bottom: var(--spacing-md);">Live Vote Distribution</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--spacing-lg);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: var(--color-saffron);" id="voteA">0</div>
+                        <div style="font-size: 13px; color: var(--color-light);">Awadhesh Prasad</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: var(--color-saffron);" id="voteB">0</div>
+                        <div style="font-size: 13px; color: var(--color-light);">Hema Malini</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 28px; font-weight: 800; color: var(--color-saffron);" id="voteC">0</div>
+                        <div style="font-size: 13px; color: var(--color-light);">Arun Govil</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="container">
+            <h2>Get In Touch</h2>
+            <div style="background: var(--color-white); padding: var(--spacing-lg); border-radius: var(--radius-lg); border-left: 4px solid var(--color-saffron); max-width: 600px; margin: var(--spacing-lg) auto;">
+                <p style="margin-bottom: var(--spacing-md); color: var(--color-light);">For questions or feedback:</p>
+                <p style="margin-bottom: var(--spacing-sm);"><strong>📧 Email:</strong> <a href="mailto:extraswork666@gmail.com" style="color: var(--color-saffron); text-decoration: none;">extraswork666@gmail.com</a></p>
+                <p style="margin-bottom: var(--spacing-sm);"><strong>📱 Mobile:</strong> <a href="tel:7701926583" style="color: var(--color-saffron); text-decoration: none;">+91 7701926583</a></p>
+            </div>
+        </section>
+
+        <!-- Disclaimer -->
+        <section class="container">
+            <div class="disclaimer-box">
+                <strong>⚠️ LEGAL DISCLAIMER:</strong> EKATRIT BHARAT is a hackathon demo platform. Mock voting and OTP systems are simulated. For demonstration purposes only.
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#transparency">Transparency</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Access</h4>
+                    <ul>
+                        <li><a href="javascript:startVotingFlow()">Start Voting</a></li>
+                        <li><a href="javascript:openAdminAccess()">🔐 Admin Panel</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="javascript:alert('Privacy Policy')">Privacy Policy</a></li>
+                        <li><a href="javascript:alert('Terms of Use')">Terms of Use</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 EKATRIT BHARAT | Hackathon Demo | One Nation One Election</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <div id="adminPage" class="admin-page">
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="#" class="navbar-logo">
+                    <span>EKATRIT</span>
+                    <span>BHARAT</span>
+                </a>
+                <div style="flex: 1; text-align: center; color: white;">
+                    <div style="font-weight: 800; font-size: 16px;">🔍 ELECTION SUPERVISION PANEL</div>
+                </div>
+                <div style="display: flex; gap: var(--spacing-md);">
+                    <button class="btn-primary-nav" onclick="adminRefreshData()">🔄 Refresh</button>
+                    <button class="btn-secondary-nav" onclick="exitAdmin()">🔓 Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="admin-container">
+            <!-- STATS -->
+            <section>
+                <h2>📊 Real-Time Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🗳️</div>
+                        <div class="stat-label">Total Votes</div>
+                        <div class="stat-value" id="totalVotesAdmin">0</div>
+                        <div class="stat-change">Live Count</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-label">Verified Voters</div>
+                        <div class="stat-value" id="totalVotersAdmin">0</div>
+                        <div class="stat-change">Active Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-label">Participation</div>
+                        <div class="stat-value" id="participationRateAdmin">0%</div>
+                        <div class="stat-change">Real-time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-label">Leading</div>
+                        <div class="stat-value" id="leadingCandidateAdmin" style="font-size: 18px;">—</div>
+                        <div class="stat-change">Current Leader</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CHART -->
+            <section class="chart-section">
+                <div class="chart-title">📊 Vote Distribution</div>
+                <div class="charts-grid">
+                    <div class="chart-wrapper">
+                        <canvas id="voteChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CANDIDATES -->
+            <section class="candidates-section">
+                <div class="candidates-title">🎯 Candidate Performance</div>
+                <table class="candidates-table">
+                    <thead>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Party</th>
+                            <th>Votes</th>
+                            <th>%</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody id="candidatesTableBody">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- DISTRICT -->
+            <section class="candidates-section">
+                <div class="candidates-title">📍 District-wise Voting</div>
+                <table class="candidates-table">
+                    <thead>
+                        <tr>
+                            <th>District</th>
+                            <th>Votes</th>
+                            <th>Top Candidate</th>
+                            <th>%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="districtTableBody">
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- LOGS -->
+            <section class="logs-section">
+                <div class="logs-title">📋 Live Voting Logs</div>
+                <div class="logs-list" id="logsList">
+                </div>
+            </section>
+
+            <!-- CONTROLS -->
+            <section class="controls-section">
+                <div class="controls-title">⚙️ Admin Controls</div>
+                <div class="controls-grid">
+                    <button class="control-btn" onclick="adminRefreshData()">🔄 Refresh Data</button>
+                    <button class="control-btn" onclick="exportAdminData()">📥 Export CSV</button>
+                    <button class="control-btn danger" onclick="if(confirm('Clear ALL voting data?')) { clearAllAdminVotes(); }">🗑️ Clear All</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="profilePage" class="profile-page">
+        <div class="profile-header">
+            <h2>Your Voter Profile</h2>
+            <p id="profileGreeting">Welcome!</p>
+        </div>
+        <div class="profile-container">
+            <div class="profile-sidebar">
+                <h3>📋 Your Details</h3>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Full Name</div>
+                    <div class="profile-info-value" id="displayName">—</div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Date of Birth</div>
+                    <div class="profile-info-value" id="displayDOB">—</div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">District</div>
+                    <div class="profile-info-value" id="displayArea">—</div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Verification ID</div>
+                    <div class="profile-info-value" id="displayPAN" style="font-family: monospace;">—</div>
+                </div>
+                <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--color-border);">
+                    <div class="profile-info-label">Status</div>
+                    <div style="font-size: 14px; color: var(--color-success); font-weight: 700; margin-top: var(--spacing-sm);">✅ Verified & Eligible</div>
+                </div>
+            </div>
+
+            <div class="profile-voting-section">
+                <h3>🗳️ Cast Your Vote</h3>
+                <form id="profileVotingForm">
+                    <label class="vote-option">
+                        <input type="radio" name="voteCandidate" value="Awadhesh_Prasad" required>
+                        <div class="vote-option-content">
+                            <div class="vote-option-name">Awadhesh Prasad</div>
+                            <div class="vote-option-party" style="color: var(--color-saffron);">🇮🇳 Samajwadi Party (SP)</div>
+                            <div class="vote-option-agenda"><strong>Agenda:</strong> Grassroots welfare, farmer support, social justice</div>
+                        </div>
+                    </label>
+
+                    <label class="vote-option">
+                        <input type="radio" name="voteCandidate" value="Hema_Malini" required>
+                        <div class="vote-option-content">
+                            <div class="vote-option-name">Hema Malini</div>
+                            <div class="vote-option-party" style="color: #ff6b35;">🇮🇳 Bharatiya Janata Party (BJP)</div>
+                            <div class="vote-option-agenda"><strong>Agenda:</strong> Economic growth, infrastructure, women empowerment</div>
+                        </div>
+                    </label>
+
+                    <label class="vote-option">
+                        <input type="radio" name="voteCandidate" value="Arun_Govil" required>
+                        <div class="vote-option-content">
+                            <div class="vote-option-name">Arun Govil</div>
+                            <div class="vote-option-party" style="color: #ff6b35;">🇮🇳 Bharatiya Janata Party (BJP)</div>
+                            <div class="vote-option-agenda"><strong>Agenda:</strong> Social welfare, education, healthcare improvement</div>
+                        </div>
+                    </label>
+
+                    <label class="vote-option">
+                        <input type="radio" name="voteCandidate" value="NOTA" required>
+                        <div class="vote-option-content">
+                            <div class="vote-option-name">NOTA</div>
+                            <div class="vote-option-party" style="color: #888; font-weight: 700;">None of the Above</div>
+                            <div class="vote-option-agenda">Your democratic right to reject all candidates</div>
+                        </div>
+                    </label>
+
+                    <div class="profile-action-buttons">
+                        <button type="submit" class="btn-submit-vote">🗳️ SUBMIT VOTE</button>
+                        <button type="button" class="btn-exit-profile" onclick="exitProfilePage()">Exit</button>
+                    </div>
+                    <p style="font-size: 12px; color: var(--color-light); margin-top: var(--spacing-md); text-align: center;">
+                        ✅ One Person = One Vote | 🔐 Encrypted & Secure
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Secure Login</h3>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div class="disclaimer-box">
+                <strong>✅ Secure Login:</strong> Enter your mobile number and verify with OTP.
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginPhone">Mobile Number</label>
+                    <input type="tel" id="loginPhone" placeholder="+91 9876543210" pattern="[0-9+\-\s]{10,}" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: var(--spacing-md) var(--spacing-lg); font-size: 16px;">Send Mock OTP</button>
+                <p style="font-size: 12px; color: var(--color-light); margin-top: var(--spacing-md); text-align: center;">⚠️ Must be 18+ years old to vote</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- OTP MODAL -->
+    <div id="otpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Verify OTP</h3>
+                <button class="close-btn" onclick="closeOtpModal()">&times;</button>
+            </div>
+            <div class="disclaimer-box">
+                <strong>Demo OTP:</strong> <span style="font-family: monospace; font-weight: 800; color: var(--color-saffron);" id="demoOtpDisplay">------</span><br>
+                <span style="font-size: 12px;">Enter any 6 digits (TEST MODE)</span>
+            </div>
+            <form id="otpForm">
+                <div class="form-group">
+                    <label for="otpInput">6-Digit OTP</label>
+                    <input type="text" id="otpInput" placeholder="000000" maxlength="6" pattern="[0-9]{6}" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: var(--spacing-md) var(--spacing-lg); font-size: 16px;">Verify OTP</button>
+                <p style="font-size: 12px; color: var(--color-light); margin-top: var(--spacing-md); text-align: center;">Expires in <span id="otpTimer">300</span>s</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Complete Profile</h3>
+                <button class="close-btn" onclick="closeProfileModal()">&times;</button>
+            </div>
+            <p style="font-size: 14px; color: var(--color-light); margin-bottom: var(--spacing-lg);">Age verification required. Must be 18+ to vote.</p>
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="profileName">Full Name</label>
+                    <input type="text" id="profileName" placeholder="Your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileDOB">Date of Birth (YYYY-MM-DD)</label>
+                    <input type="date" id="profileDOB" required>
+                </div>
+                <div class="form-group">
+                    <label for="profilePAN">PAN (Last 4 Digits)</label>
+                    <input type="text" id="profilePAN" placeholder="XXXX" maxlength="4" pattern="[A-Za-z0-9]{4}" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileArea">Your District</label>
+                    <select id="profileArea" required>
+                        <option value="">-- Select District --</option>
+                        <option value="Mathura">Mathura</option>
+                        <option value="Meerut">Meerut</option>
+                        <option value="Ghaziabad">Ghaziabad</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; padding: var(--spacing-md) var(--spacing-lg); font-size: 16px;">Complete & Proceed to Vote</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // STATE
+        let currentUser = null;
+        let mockOTP = null;
+        let otpTimer = null;
+        let adminChart = null;
+        const ADMIN_PIN = '130436';
+        const CANDIDATES = {
+            'Awadhesh_Prasad': { name: 'Awadhesh Prasad', party: 'Samajwadi Party (SP)', color: '#ff9933' },
+            'Hema_Malini': { name: 'Hema Malini', party: 'Bharatiya Janata Party (BJP)', color: '#ff6b35' },
+            'Arun_Govil': { name: 'Arun Govil', party: 'Bharatiya Janata Party (BJP)', color: '#ff6b35' },
+            'NOTA': { name: 'NOTA', party: 'None of the Above', color: '#888' }
+        };
+
+        // ADMIN ACCESS
+        function openAdminAccess() {
+            document.getElementById('adminPinLock').classList.remove('hidden');
+            document.getElementById('adminPinInput').focus();
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === ADMIN_PIN) {
+                document.getElementById('adminPinLock').classList.add('hidden');
+                document.getElementById('votingPage').classList.remove('active');
+                document.getElementById('adminPage').classList.add('active');
+                document.body.classList.add('admin-mode');
+                adminRefreshData();
+            } else {
+                document.getElementById('adminPinError').style.display = 'block';
+                document.getElementById('adminPinInput').value = '';
+                setTimeout(() => {
+                    document.getElementById('adminPinError').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        document.getElementById('adminPinInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyAdminPin();
+        });
+
+        function exitAdmin() {
+            if (confirm('Exit admin panel?')) {
+                document.getElementById('adminPage').classList.remove('active');
+                document.getElementById('votingPage').classList.add('active');
+                document.body.classList.remove('admin-mode');
+                document.getElementById('adminPinInput').value = '';
+            }
+        }
+
+        // VOTING FLOW
+        function startVotingFlow() {
+            if (currentUser) {
+                openProfilePage();
+            } else {
+                openLoginModal();
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function openOtpModal(phone) {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('otpModal').style.display = 'block';
+            mockOTP = String(Math.floor(100000 + Math.random() * 900000));
+            document.getElementById('demoOtpDisplay').textContent = mockOTP;
+            alert('🧪 TEST MODE - Mock OTP: ' + mockOTP);
+            startOTPTimer();
+        }
+
+        function closeOtpModal() {
+            document.getElementById('otpModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            if (otpTimer) clearInterval(otpTimer);
+        }
+
+        function startOTPTimer() {
+            let timeLeft = 300;
+            document.getElementById('otpTimer').textContent = timeLeft;
+            otpTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('otpTimer').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    showToast('OTP Expired', 'error');
+                }
+            }, 1000);
+        }
+
+        function openProfileModal() {
+            document.getElementById('otpModal').style.display = 'none';
+            document.getElementById('profileModal').style.display = 'block';
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function openProfilePage() {
+            document.getElementById('profileModal').style.display = 'none';
+            document.getElementById('profilePage').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('profileGreeting').textContent = `Welcome, ${currentUser.name}!`;
+            document.getElementById('displayName').textContent = currentUser.name;
+            document.getElementById('displayDOB').textContent = currentUser.dob;
+            document.getElementById('displayArea').textContent = currentUser.area;
+            document.getElementById('displayPAN').textContent = currentUser.panHash;
+        }
+
+        function exitProfilePage() {
+            document.getElementById('profilePage').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentUser = null;
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideInUp 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // FORMS
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const phone = document.getElementById('loginPhone').value;
+            if (!phone || phone.length < 10) {
+                showToast('Invalid phone', 'error');
+                return;
+            }
+            currentUser = { phone: phone, profileComplete: false };
+            this.reset();
+            closeLoginModal();
+            openOtpModal(phone);
+        });
+
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const otp = document.getElementById('otpInput').value;
+            if (otp.length !== 6) {
+                showToast('Enter 6 digits', 'error');
+                return;
+            }
+            if (otpTimer) clearInterval(otpTimer);
+            showToast('✅ OTP Verified!');
+            this.reset();
+            closeOtpModal();
+            openProfileModal();
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('profileName').value;
+            const dob = document.getElementById('profileDOB').value;
+            const pan = document.getElementById('profilePAN').value;
+            const area = document.getElementById('profileArea').value;
+
+            if (!name || !dob || !pan || !area) {
+                showToast('Fill all fields', 'error');
+                return;
+            }
+
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            if (age < 18) {
+                showToast('❌ Must be 18+ years old', 'error');
+                return;
+            }
+
+            const panHash = btoa(pan + dob).substring(0, 8);
+            const votes = JSON.parse(localStorage.getItem('ekatritVotes') || '{}');
+            if (votes[panHash]) {
+                showToast('❌ Already voted', 'error');
+                return;
+            }
+
+            currentUser = { ...currentUser, name, dob, panHash, area, profileComplete: true };
+            this.reset();
+            closeProfileModal();
+            openProfilePage();
+        });
+
+        document.getElementById('profileVotingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const candidate = document.querySelector('input[name="voteCandidate"]:checked');
+            if (!candidate) {
+                showToast('Select a candidate', 'error');
+                return;
+            }
+
+            const votes = JSON.parse(localStorage.getItem('ekatritVotes') || '{}');
+            votes[currentUser.panHash] = {
+                candidate: candidate.value,
+                area: currentUser.area,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('ekatritVotes', JSON.stringify(votes));
+
+            showToast('🎉 Vote submitted!');
+            this.reset();
+            exitProfilePage();
+            currentUser = null;
+            updatePublicStats();
+        });
+
+        // STATS
+        function updatePublicStats() {
+            const votes = JSON.parse(localStorage.getItem('ekatritVotes') || '{}');
+            const voteArray = Object.values(votes);
+            const total = voteArray.length;
+
+            document.getElementById('totalVotes').textContent = total;
+            document.getElementById('totalVoters').textContent = total;
+            document.getElementById('participationRate').textContent = total > 0 ? '100%' : '0%';
+
+            let voteA = 0, voteB = 0, voteC = 0;
+            voteArray.forEach(v => {
+                if (v.candidate === 'Awadhesh_Prasad') voteA++;
+                if (v.candidate === 'Hema_Malini') voteB++;
+                if (v.candidate === 'Arun_Govil') voteC++;
+            });
+
+            document.getElementById('voteA').textContent = voteA;
+            document.getElementById('voteB').textContent = voteB;
+            document.getElementById('voteC').textContent = voteC;
+        }
+
+        function getVotingData() {
+            const votes = JSON.parse(localStorage.getItem('ekatritVotes') || '{}');
+            const voteArray = Object.values(votes);
+            const candidateCounts = {};
+            const districtCounts = {};
+
+            Object.keys(CANDIDATES).forEach(key => candidateCounts[key] = 0);
+
+            voteArray.forEach(vote => {
+                const candidate = vote.candidate;
+                const area = vote.area || 'Unknown';
+                if (candidateCounts[candidate] !== undefined) candidateCounts[candidate]++;
+                if (!districtCounts[area]) districtCounts[area] = { total: 0, candidates: {} };
+                districtCounts[area].total++;
+                districtCounts[area].candidates[candidate] = (districtCounts[area].candidates[candidate] || 0) + 1;
+            });
+
+            return { total: voteArray.length, votes: voteArray, candidateCounts, districtCounts };
+        }
+
+        function adminRefreshData() {
+            const data = getVotingData();
+            const total = data.total;
+
+            document.getElementById('totalVotesAdmin').textContent = total;
+            document.getElementById('totalVotersAdmin').textContent = total;
+            document.getElementById('participationRateAdmin').textContent = total > 0 ? '100%' : '0%';
+
+            let leading = '—', maxVotes = 0;
+            Object.entries(data.candidateCounts).forEach(([key, count]) => {
+                if (count > maxVotes) { maxVotes = count; leading = CANDIDATES[key].name; }
+            });
+            document.getElementById('leadingCandidateAdmin').textContent = leading;
+
+            updateAdminChart(data);
+            updateCandidatesTable(data);
+            updateDistrictTable(data);
+            updateLogs(data.votes);
+        }
+
+        function updateAdminChart(data) {
+            const ctx = document.getElementById('voteChart');
+            if (!ctx) return;
+
+            const labels = [], votes = [], colors = [];
+            Object.entries(data.candidateCounts).forEach(([key, count]) => {
+                labels.push(CANDIDATES[key].name);
+                votes.push(count);
+                colors.push(CANDIDATES[key].color);
+            });
+
+            if (adminChart) adminChart.destroy();
+
+            adminChart = new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels, datasets: [{
+                        data: votes, backgroundColor: colors, borderColor: '#1a1a1a', borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom', labels: {
+                                color: '#aaa', padding: 20, font: { size: 14, weight: 'bold' },
+                                generateLabels: (chart) => chart.data.labels.map((label, i) => ({
+                                    text: `${label}: ${chart.data.datasets[0].data[i]} votes`,
+                                    fillStyle: chart.data.datasets[0].backgroundColor[i], hidden: false, index: i
+                                }))
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCandidatesTable(data) {
+            const tbody = document.getElementById('candidatesTableBody');
+            tbody.innerHTML = '';
+            const total = data.total || 1;
+
+            Object.entries(data.candidateCounts).sort((a, b) => b[1] - a[1]).forEach(([key, count]) => {
+                const candidate = CANDIDATES[key];
+                const percentage = ((count / total) * 100).toFixed(2);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><div class="candidate-name">${candidate.name}</div><div class="candidate-party">${candidate.party}</div></td>
+                    <td>${candidate.party}</td>
+                    <td><strong style="color: ${candidate.color};">${count}</strong></td>
+                    <td><strong style="color: ${candidate.color};">${percentage}%</strong></td>
+                    <td><div class="vote-bar"><div class="vote-bar-fill" style="width: ${Math.max(percentage, 5)}%; background: linear-gradient(90deg, ${candidate.color} 0%, ${candidate.color}99 100%);">${percentage > 5 ? percentage + '%' : ''}</div></div></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateDistrictTable(data) {
+            const tbody = document.getElementById('districtTableBody');
+            tbody.innerHTML = '';
+
+            Object.entries(data.districtCounts).sort((a, b) => b[1].total - a[1].total).forEach(([district, districtData]) => {
+                let topCandidate = '—', topVotes = 0;
+                Object.entries(districtData.candidates).forEach(([candidate, votes]) => {
+                    if (votes > topVotes) { topVotes = votes; topCandidate = CANDIDATES[candidate].name; }
+                });
+                const percentage = ((districtData.total / data.total) * 100).toFixed(2);
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><strong>${district}</strong></td><td>${districtData.total}</td><td>${topCandidate}</td><td><strong style="color: var(--color-saffron);">${percentage}%</strong></td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateLogs(votes) {
+            const logsList = document.getElementById('logsList');
+            logsList.innerHTML = '';
+            const recentVotes = votes.slice().reverse().slice(0, 15);
+
+            recentVotes.forEach((vote) => {
+                const time = new Date(vote.timestamp).toLocaleTimeString('en-IN');
+                const candidate = CANDIDATES[vote.candidate];
+                const area = vote.area || 'Unknown';
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                logItem.innerHTML = `
+                    <div class="log-time">${time}</div>
+                    <div class="log-action">✅ Vote: <strong>${candidate.name}</strong></div>
+                    <div class="log-details">📍 ${area} | 🇮🇳 ${candidate.party}</div>
+                `;
+                logsList.appendChild(logItem);
+            });
+
+            if (recentVotes.length === 0) {
+                logsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No votes yet</div>';
+            }
+        }
+
+        function exportAdminData() {
+            const data = getVotingData();
+            let csv = 'Candidate,Party,Votes,Percentage\n';
+            const total = data.total || 1;
+
+            Object.entries(data.candidateCounts).forEach(([key, count]) => {
+                const candidate = CANDIDATES[key];
+                const percentage = ((count / total) * 100).toFixed(2);
+                csv += `"${candidate.name}","${candidate.party}",${count},${percentage}%\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `election-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
+        function clearAllAdminVotes() {
+            localStorage.removeItem('ekatritVotes');
+            adminRefreshData();
+            alert('All data cleared');
+        }
+
+        // CLOSE MODALS ON CLICK OUTSIDE
+        window.addEventListener('click', function(e) {
+            ['loginModal', 'otpModal', 'profileModal'].forEach(id => {
+                const modal = document.getElementById(id);
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    if (otpTimer) clearInterval(otpTimer);
+                }
+            });
+        });
+
+        // AUTO-REFRESH ADMIN
+        setInterval(() => {
+            if (document.getElementById('adminPage').classList.contains('active')) {
+                adminRefreshData();
+            }
+        }, 3000);
+
+        // INIT
+        updatePublicStats();
+    </script>
+</body>
+</html>
